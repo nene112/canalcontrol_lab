@@ -1,10 +1,6 @@
-# canalcontrol_lab
-软件包说明
-# 环境要求
-windows+python3.9
+`canalcontrol_lab`软件包说明
 
-
-调用时候请参考给出的调用例子，调用api的前后顺序有要求。
+调用时候请参考给出的调用例子(`test-ph.py`,`test-sh.py`)，调用api的前后顺序有要求。
 
 # 读取文件并直接求解
 
@@ -20,7 +16,47 @@ ras= obj.ReadAndSolve(".", "vwn","sh-RMGateSchedule.txt.json","Roe")
 
 
 
-# 读取文件、设置参数、求解
+
+
+# 参数设置接口
+
+相关参数设置接口与上面给出的`solver_batch.setWidth(width)`使用方法一样。
+
+C++实现如下，函数名称与python中一致。
+
+```c++
+    .def("setWidth", &Lab::setWidth)                       //设置底宽
+    .def("setElevation", &Lab::setElevation)              //设置渠底高程
+    .def("setWaterDepth", &Lab::setWaterDepth)              //设置水深
+    .def("setwWaterLevel", &Lab::setwWaterLevel)           //设置水位
+    .def("settanb", &Lab::settanb)                          //设置边坡
+    .def("setmanning", &Lab::setmanning)                    //设置糙率
+```
+
+# 获取参数接口
+
+相关参数设置接口与上面给出的`solver_batch.setWidth(width)`使用方法一样。
+
+C++实现如下，函数名称与python中一致，返回的是数组，数组中元素的索引即为离散点的编号，
+
+```c++
+.def("getWidth", &Lab::getWidth)
+.def("getElevation", &Lab::getElevation)
+.def("getWaterDepth", &Lab::getWaterDepth)
+.def("getWaterLevel", &Lab::getWaterLevel)
+.def("gettanb", &Lab::gettanb)
+.def("getmanning", &Lab::getmanning)
+```
+
+
+
+
+
+
+
+
+
+# batch调用方法
 
 该方法能够将模型拆分为四个步骤，
 
@@ -37,7 +73,7 @@ solver_batch = canalcontrol_lab.Lab(10)  #初始化求解器
 solver_batch.setEpisodeDuration_minites(3 * 24 * 60) #设置仿真时间（单位：min）
 solver_batch.setOutputStep_seconds(60 * 60) #设置输出结果的时间间隔（单位：seconds）
 solver_batch.ClearSolver() # 清空内存，保证求解器从空数据开始
-solver_batch.ReadMesh(".", "vwn") # 读取输入文件，指定边界条件处理方法，PSH灌区全部采用“vwn”，其他灌区无限制，但该参数必须填写（"vwn"或任意字符串）
+solver_batch.ReadMesh(".", "vwn") # “.”代表读取py文件目录下的文件，读取输入文件，指定边界条件处理方法，PSH灌区建议全部采用“vwn”，其他灌区无限制，但该参数必须填写（"vwn"或任意字符串，如""）
 # //修改参数,先获取当前离散点数量num
 num = solver_batch.GetPointsNum() # 获取求解器中的离散点数量
 # 给定每个离散点的参数
@@ -46,27 +82,14 @@ width = np.full(num, fill_value=100) # 根据离散点数量，定义每个点�
 solver_batch.setWidth(width) # 根据离散点数量，设置每个点的参数
 
 solver_batch.setBC("sh-RMGateSchedule.txt.json") # 读取调度方案文件（每个闸门的过流量时间序列）
-solver_batch.Solver("Roe") # 求解，可指定不同求解器，目前参数选项包括：Roe，Pressure
+solver_batch.Solver("Roe") # 必填，选择求解，可指定不同求解器，目前参数选项包括：Roe，Pressure,淠史杭相关案例建议采用Roe
 solver_batch.WriteTimeSeries("wh") # 输出仿真结果到文件
 solver_batch.ClearSolver() # 清空内存，防止内存泄漏
 ```
 
-## 参数设置接口
-
-相关参数设置接口与上面给出的`solver_batch.setWidth(width)`使用方法一样。
-
-```c++
-    .def("setWidth", &Lab::setWidth)
-    .def("setElevation", &Lab::setElevation)
-    .def("setWaterDepth", &Lab::setWaterDepth)
-    .def("setwWaterLevel", &Lab::setwWaterLevel)
-    .def("settanb", &Lab::settanb)
-    .def("setmanning", &Lab::setmanning)
-```
 
 
-
-# 读取文件、设置参数、逐时间步求解、获取结果、输出结果
+# step调用方法
 
 该方法将求解器拆解为时间步级别，提供更高的自由度：
 
@@ -191,4 +214,28 @@ void UpwindSVE::WriteTimeSeries(string stateType) {
 ```
 
 
+
+# executeControl(int，double)
+
+控制闸门过流量，参数为（闸门编号，流量）
+
+```python
+for k in range( int(3 * 24 * 60 * 60 / 4))  :
+  solver.updateBC(k) 
+  solver.executeControl(int(0),100.0)
+  solver.stepSolver("Roe", k) 
+  state = solver.GetstepState("wh") 
+  solver.UpdateResult_pt(k) 
+
+```
+
+
+
+
+
+
+
+# WriteGatesLists()
+
+输出闸门-编号对应文件
 
