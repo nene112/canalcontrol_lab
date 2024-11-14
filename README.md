@@ -1,5 +1,8 @@
 # canalcontrol_lab
 软件包说明
+# 环境要求
+windows+python3.9
+
 
 调用时候请参考给出的调用例子，调用api的前后顺序有要求。
 
