@@ -22,7 +22,7 @@ ras= obj.ReadAndSolve(".", "vwn","sh-RMGateSchedule.txt.json","Roe")
 
 相关参数设置接口与上面给出的`solver_batch.setWidth(width)`使用方法一样。
 
-C++实现如下，函数名称与python中一致。
+C++实现如下，函数名称与python中一致，输入的应为数组，数组中元素的索引即为离散点的编号，
 
 ```c++
     .def("setWidth", &Lab::setWidth)                       //设置底宽
@@ -32,6 +32,17 @@ C++实现如下，函数名称与python中一致。
     .def("settanb", &Lab::settanb)                          //设置边坡
     .def("setmanning", &Lab::setmanning)                    //设置糙率
 ```
+
+一个简单的py设置参数示例，
+```
+#修改参数,先获取当前离散点数量num
+num = solver_batch.GetPointsNum() 
+# 给定每个离散点的参数
+width = np.full(num, fill_value=100)
+# 设置参数
+solver_batch.setWidth(width) 
+```
+
 
 # 获取参数接口
 
@@ -217,7 +228,7 @@ void UpwindSVE::WriteTimeSeries(string stateType) {
 
 # executeControl(int，double)
 
-控制闸门过流量，参数为（闸门编号，流量）
+控制闸门过流量，参数为（闸门离散点编号，流量）
 
 ```python
 for k in range( int(3 * 24 * 60 * 60 / 4))  :
