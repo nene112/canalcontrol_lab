@@ -17,8 +17,8 @@ import canalcontrol_lab
 obj = canalcontrol_lab.Lab(0)
 
 
-# auto batch versino
-ras= obj.ReadAndSolve(".", "vwn","sh-RMGateSchedule.txt.json","Roe")
+# # auto batch versino
+# ras= obj.ReadAndSolve(".", "vwn","sh-RMGateSchedule.txt.json","Roe")
 
 
 # batch versino
@@ -45,13 +45,15 @@ solver.setOutputStep_seconds(60 * 60)
 solver.ClearSolver() 
 solver.ReadMesh(".", "vwn") 
 solver.setBC("sh-RMGateSchedule.txt.json") 
+print(solver.getWidth())
 solver.initiateSolver() 
 for k in range( int(3 * 24 * 60 * 60 / 4))  :
-  solver.updateBC(k) 
+  solver.updateBC(k,[]) 
   solver.stepSolver("Roe", k) 
   state = solver.GetstepState("wh") 
   solver.UpdateResult_pt(k) 
+  if k% 900==0:
+    print(k/900)
 
 solver.WriteTimeSeries("wh","",595)
 solver.ClearSolver()
-
