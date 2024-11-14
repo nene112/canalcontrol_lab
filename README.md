@@ -185,7 +185,7 @@ std::vector<double> UpwindSVE::GetstepState(string stateType) {
 ## WriteTimeSeries()函数的要求与其他选项
 
 要使用`WriteTimeSeries`必须逐时间步保存计算结果，即调用`solver.UpdateResult_pt(k)`
-
+其中参数与`GetstepState(string str)函数`中的参数选项含义一致；
 该函数的C实现如下，通过该实现可知其他的参数选项，
 
 ```python
