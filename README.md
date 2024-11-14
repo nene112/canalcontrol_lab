@@ -232,19 +232,19 @@ void UpwindSVE::WriteTimeSeries(string stateType) {
 
 ```python
 for k in range( int(3 * 24 * 60 * 60 / 4))  :
-  solver.updateBC(k) 
+  solver.updateBC(k,[]) 
   solver.executeControl(int(0),100.0)
   solver.stepSolver("Roe", k) 
   state = solver.GetstepState("wh") 
   solver.UpdateResult_pt(k) 
 
 ```
-
-
-
-
-
-
+其中，`olver.updateBC(k,[]) `函数接口中的`[]`代表相应离散点编号的闸门不按照`solver.setBC("sh-RMGateSchedule.txt.json") `设定的边界条件执行，因为后续的程序中希望利用别的软件或算法控制此闸门的过流量；
+闸门对应的离散点编号可通过`GetGatesLists`获取或者通过`WriteGatesLists`输出到文件，简单示例如下：
+```
+glists=solver.GetGatesLists() 
+solver.WriteGatesLists() 
+```
 
 # WriteGatesLists()
 
