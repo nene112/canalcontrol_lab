@@ -1,6 +1,9 @@
-`canalcontrol_lab`软件包说明
+# `canalcontrol_lab`软件包说明
 
 调用时候请参考给出的调用例子(`test-ph.py`,`test-sh.py`)，调用api的前后顺序有要求。
+
+# 平台及环境要求
+windows+py3.9
 
 # 读取文件并直接求解
 
